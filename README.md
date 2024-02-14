@@ -1,2 +1,5 @@
-# YouTubeRss-Telegram-Bot
-Get the RSS feed for any channel. Send the channel URL to https://t.me/YouTubeRSSGeneratorBot.
+# Installation for Ubuntu server
+
+```
+apt install libnss3-dev libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev libasound2
+```

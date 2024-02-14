@@ -1,0 +1,8 @@
+{
+  // the userId of the users that will receive the notifications. Integers. Get them with @userinfobot.
+  "users": [],
+  "subscribers": [],
+  // every 30 minutes check for new results
+  "cron": "*/30 * * * *",
+  "timezone": "America/Monterrey"
+}

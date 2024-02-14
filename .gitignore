@@ -1,0 +1,7 @@
+
+.env
+.vscode
+full.*
+deno.lock
+*.png
+constants.jsonc
