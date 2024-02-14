@@ -6,6 +6,13 @@ import VideoInfo from "../types/videoInfo.type.ts";
 import { videoInfoSchema } from "../types/videoInfo.type.ts";
 import { getRssFoundByChannelAlias } from "../data/controllers/rssFoundController.ts";
 
+bot.command("start", (ctx) =>
+  ctx.reply(
+    "Welcome to the YouTube RSS feed bot!\n\n" +
+      "Send me a YouTube channel URL and I will give you the RSS feed link for that channel."
+  )
+);
+
 bot.on("message:text", (ctx) =>
   (async () => {
     const url = isURLValid(ctx.message.text);
@@ -52,6 +59,8 @@ bot.on("message:text", (ctx) =>
         console.error(e);
         await ctx.reply("An error ocurred while processing the video URL.");
       }
-    } else await ctx.reply("This is not a valid YouTube URL for a channel.");
+    }
+    // If the url is not for a channel
+    else await ctx.reply("This is not a valid YouTube URL for a channel.");
   })().catch(console.error)
 );
