@@ -12,15 +12,10 @@
   },
   "imports": {
     "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
-    "cron": "https://deno.land/x/croner@8.0.1-dev.0/dist/croner.js",
     "dotenv": "https://deno.land/std@0.215.0/dotenv/load.ts",
-    "escapeHtml": "https://deno.land/x/escape_html@1.0.0/mod.ts",
     "grammy/": "https://deno.land/x/grammy@v1.20.4/",
     "joi": "https://esm.sh/joi@17.12.1/",
     "kvdex": "https://deno.land/x/kvdex@0.34.1/mod.ts",
-    "lodash": "https://deno.land/x/deno_ts_lodash@0.0.1/mod.ts",
-    "moment": "npm:moment@2.29.4",
-    "sleep": "https://deno.land/x/sleep@v1.3.0/mod.ts",
     "std/": "https://deno.land/std@0.215.0/",
     "zod": "https://deno.land/x/zod@v3.22.4/mod.ts"
   }
