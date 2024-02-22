@@ -16,7 +16,7 @@ bot.command("start", (ctx) =>
 bot.on("message:text", (ctx) =>
   (async () => {
     const url = isURLValid(ctx.message.text);
-    if (!url || (url.hostname !== "www.youtube.com" && url.hostname !== "youtube.com"))
+    if (!url || (url.hostname !== "www.youtube.com" && url.hostname !== "youtube.com" && url.hostname !== "music.youtube.com"))
       return await ctx.reply("This is not a valid URL. Please send a valid YouTube Channel URL.");
 
     const { pathname } = url;
