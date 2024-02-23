@@ -1,6 +1,7 @@
 import { Bot } from "grammy/mod.ts";
 import { BOT_TOKEN } from "../env.ts";
 import nextFunction from "./nextFunction.ts";
+import { sendIdComposer } from "./sendId.ts";
 import freshrss from "../freshrss/freshrss.ts";
 import messagesHandler from "./messagesHandler.ts";
 
@@ -14,3 +15,4 @@ bot.use(nextFunction);
 
 bot.use(freshrss);
 bot.use(messagesHandler);
+bot.use(sendIdComposer);
