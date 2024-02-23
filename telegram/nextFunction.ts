@@ -5,7 +5,7 @@ import { deleteUserContext } from "../data/controllers/userContextController.ts"
 
 const nextFunction = new Composer();
 
-const a = [undefined] as [undefined];
+// const a = [undefined] as [undefined];
 
 nextFunction.command(
   "cancel",
