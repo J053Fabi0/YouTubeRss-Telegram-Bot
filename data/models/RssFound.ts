@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-export type RssFound = z.infer<typeof RssFoundSentModel>;
+export type RssFound = z.infer<typeof RssFoundModel>;
 
-const RssFoundSentModel = z.object({
+const RssFoundModel = z.object({
   channelId: z.string(),
   channelAlias: z.string(),
 });
 
-export default RssFoundSentModel;
+export default RssFoundModel;

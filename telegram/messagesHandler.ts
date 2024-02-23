@@ -1,20 +1,22 @@
 import axiod from "axiod";
-import bot from "./initBot.ts";
 import db from "../data/database.ts";
 import isURLValid from "../utils/isURLValid.ts";
 import extractURL from "../utils/exctractURL.ts";
 import VideoInfo from "../types/videoInfo.type.ts";
 import { videoInfoSchema } from "../types/videoInfo.type.ts";
 import { getRssFoundByChannelAlias } from "../data/controllers/rssFoundController.ts";
+import { Composer } from "grammy/mod.ts";
 
-bot.command("start", (ctx) =>
+const messagesHandler = new Composer();
+
+messagesHandler.command("start", (ctx) =>
   ctx.reply(
     "Welcome to the YouTube RSS feed bot!\n\n" +
       "Send me a YouTube channel URL and I will give you the RSS feed link for that channel."
   )
 );
 
-bot.on("message:text", (ctx) =>
+messagesHandler.on("message:text", (ctx) =>
   (async () => {
     const url = isURLValid(extractURL(ctx.message.text));
     if (!url || !/^((www\.)?youtube\.com|music\.youtube\.com)$/.test(url.hostname))
@@ -65,3 +67,5 @@ bot.on("message:text", (ctx) =>
     else await ctx.reply("This is not a valid YouTube URL for a channel.");
   })().catch(console.error)
 );
+
+export default messagesHandler;
