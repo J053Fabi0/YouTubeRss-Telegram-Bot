@@ -34,7 +34,7 @@ messagesHandler.on("message:text", (ctx) =>
       if (channelId) return await sendId(ctx, channelId);
 
       try {
-        const { data: htmlContent } = await axiod.get<string>(ctx.message.text);
+        const { data: htmlContent } = await axiod.get<string>(url.href);
 
         const jsonData: VideoInfo = JSON.parse(
           htmlContent.slice(htmlContent.indexOf("var ytInitialData = ") + 19).split(";</script>")[0]
