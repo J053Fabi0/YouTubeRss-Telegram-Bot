@@ -31,40 +31,36 @@ export default async function sendId(
   });
 }
 
-sendIdComposer.callbackQuery(
-  /^subscribe:(p|c)/,
-  (ctx) =>
-    void (async () => {
-      const freshRssAuth = await getFreshRSSAuth(ctx.from.id.toString());
-      if (!freshRssAuth)
-        return ctx.answerCallbackQuery({ text: "You need to log in to FreshRSS first. Use /freshrss" });
+sendIdComposer.callbackQuery(/^subscribe:(p|c)/, async (ctx) => {
+  const freshRssAuth = await getFreshRSSAuth(ctx.from.id.toString());
+  if (!freshRssAuth)
+    return ctx.answerCallbackQuery({ text: "You need to log in to FreshRSS first. Use /freshrss" });
 
-      const data = ctx.callbackQuery.data.slice(11).split(" ");
-      const type = ctx.callbackQuery.data[10] as "c" | "p";
-      const category = data.slice(0, -1).join(" ") || undefined;
-      const id = data[data.length - 1];
+  const data = ctx.callbackQuery.data.slice(11).split(" ");
+  const type = ctx.callbackQuery.data[10] as "c" | "p";
+  const category = data.slice(0, -1).join(" ") || undefined;
+  const id = data[data.length - 1];
 
-      const feedUrl = new URL("https://www.youtube.com/feeds/videos.xml");
-      if (type === "p") feedUrl.searchParams.set("playlist_id", id);
-      else feedUrl.searchParams.set("channel_id", id);
+  const feedUrl = new URL("https://www.youtube.com/feeds/videos.xml");
+  if (type === "p") feedUrl.searchParams.set("playlist_id", id);
+  else feedUrl.searchParams.set("channel_id", id);
 
-      try {
-        await subscribe(freshRssAuth.instanceUrl, freshRssAuth.auth, feedUrl.toString(), category);
+  try {
+    await subscribe(freshRssAuth.instanceUrl, freshRssAuth.auth, feedUrl.toString(), category);
 
-        await ctx.editMessageText(`<code>${feedUrl}</code>\n\nSubscribed!`, { parse_mode: "HTML" });
-        await ctx.answerCallbackQuery();
-      } catch (e) {
-        if (isAxiodError(e)) {
-          console.error(e);
-          await ctx.editMessageText(
-            `<code>${feedUrl}</code>\n\n` +
-              `An error ocurred while subscribing. Maybe you are already subscribed or you need to login again using /freshrss.`,
-            { parse_mode: "HTML" }
-          );
-          await ctx.answerCallbackQuery();
-        } else {
-          console.error(e);
-        }
-      }
-    })().catch(console.error)
-);
+    await ctx.editMessageText(`<code>${feedUrl}</code>\n\nSubscribed!`, { parse_mode: "HTML" });
+    await ctx.answerCallbackQuery();
+  } catch (e) {
+    if (isAxiodError(e)) {
+      console.error(e);
+      await ctx.editMessageText(
+        `<code>${feedUrl}</code>\n\n` +
+          `An error ocurred while subscribing. Maybe you are already subscribed or you need to login again using /freshrss.`,
+        { parse_mode: "HTML" }
+      );
+      await ctx.answerCallbackQuery();
+    } else {
+      console.error(e);
+    }
+  }
+});

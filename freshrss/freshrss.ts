@@ -20,47 +20,38 @@ const startMessage =
 const alreadyLoggedInMessage = "You are already logged in.";
 
 // Receive the command /freshrss
-freshrss.command(
-  "freshrss",
-  (ctx) =>
-    void (async () => {
-      const isLoggedIn = ctx.from && (await getFreshRSSAuth(ctx.from.id.toString())) !== null;
-      if (isLoggedIn) ctx.reply(alreadyLoggedInMessage, { reply_markup: logoutKeyboard });
-      else
-        ctx.reply(startMessage, {
-          parse_mode: "HTML",
-          reply_markup: yesNoKeyboard,
-          link_preview_options: { is_disabled: true },
-        });
-    })().catch(console.error)
-);
+freshrss.command("freshrss", async (ctx) => {
+  const isLoggedIn = ctx.from && (await getFreshRSSAuth(ctx.from.id.toString())) !== null;
+  if (isLoggedIn) ctx.reply(alreadyLoggedInMessage, { reply_markup: logoutKeyboard });
+  else
+    ctx.reply(startMessage, {
+      parse_mode: "HTML",
+      reply_markup: yesNoKeyboard,
+      link_preview_options: { is_disabled: true },
+    });
+});
 
 // The user is not interested
-freshrss.callbackQuery(
-  "freshrss:no",
-  (ctx) => void ctx.editMessageText("Okay, you can sync your FreshRSS account later.").catch(console.error)
+freshrss.callbackQuery("freshrss:no", (ctx) =>
+  ctx.editMessageText("Okay, you can sync your FreshRSS account later.")
 );
 
 const askForEmailMessage =
   "Please send me the URL of your FreshRSS instance. For example: <code>https://freshrss.example.net</code>";
 // The user is interested. Ask for the FreshRSS URL
-freshrss.callbackQuery(
-  "freshrss:yes",
-  (ctx) =>
-    void (async () => {
-      await setUserContext(ctx.from.id.toString(), {
-        data: {},
-        nextFunction: "getFreshRssUrl",
-        contextId: UserContextIds.AskingForFreshRssUrl,
-      });
-      const isLoggedIn = ctx.from && (await getFreshRSSAuth(ctx.from.id.toString())) !== null;
-      await ctx.editMessageText(isLoggedIn ? alreadyLoggedInMessage : startMessage, {
-        parse_mode: "HTML",
-        link_preview_options: { is_disabled: true },
-      });
-      await ctx.reply(askForEmailMessage, { parse_mode: "HTML" });
-    })().catch(console.error)
-);
+freshrss.callbackQuery("freshrss:yes", async (ctx) => {
+  await setUserContext(ctx.from.id.toString(), {
+    data: {},
+    nextFunction: "getFreshRssUrl",
+    contextId: UserContextIds.AskingForFreshRssUrl,
+  });
+  const isLoggedIn = ctx.from && (await getFreshRSSAuth(ctx.from.id.toString())) !== null;
+  await ctx.editMessageText(isLoggedIn ? alreadyLoggedInMessage : startMessage, {
+    parse_mode: "HTML",
+    link_preview_options: { is_disabled: true },
+  });
+  await ctx.reply(askForEmailMessage, { parse_mode: "HTML" });
+});
 
 // Receive the URL of the FreshRSS instance
 export async function getFreshRssUrl(ctx: Filter<Context, "message">) {
@@ -115,13 +106,9 @@ export async function getFreshRssPassword(ctx: Filter<Context, "message">, { dat
 }
 
 // Logout
-freshrss.callbackQuery(
-  "freshrss:logout",
-  (ctx) =>
-    void (async () => {
-      await db.freshRssAuth.deleteByPrimaryIndex("userId", ctx.from.id.toString());
-      await ctx.editMessageText("You have been logged out.");
-    })().catch(console.error)
-);
+freshrss.callbackQuery("freshrss:logout", async (ctx) => {
+  await db.freshRssAuth.deleteByPrimaryIndex("userId", ctx.from.id.toString());
+  await ctx.editMessageText("You have been logged out.");
+});
 
 export default freshrss;

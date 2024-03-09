@@ -19,4 +19,9 @@ bot.use(freshrss);
 bot.use(messagesHandler);
 bot.use(sendIdComposer);
 
+bot.catch(({ ctx, error }) => {
+  console.error(`Error while handling update ${ctx.update.update_id}:`, error);
+  ctx.reply("There was an error.");
+});
+
 run(bot);
