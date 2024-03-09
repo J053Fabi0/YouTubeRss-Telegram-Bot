@@ -13,7 +13,8 @@ const messagesHandler = new Composer();
 messagesHandler.command("start", (ctx) =>
   ctx.reply(
     "Welcome to the YouTube RSS feed bot!\n\n" +
-      "Send me a YouTube channel URL and I will give you the RSS feed link for that channel."
+      "Send me a YouTube channel URL and I will give you the RSS feed link for that channel.\n" +
+      "You can send me a playlist or YouTube Music channel too."
   )
 );
 
