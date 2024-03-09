@@ -26,12 +26,15 @@ messagesHandler.on("message:text", (ctx) =>
     const { pathname } = url;
 
     // See if the url is a channel id
-    if (pathname.startsWith("/channel/")) await sendId(ctx, pathname.slice(9).split("/")[0]);
+    if (pathname.startsWith("/channel/")) await sendId(ctx, pathname.slice(9).split("/")[0], "channel");
+    // If it's a playlist url
+    if (pathname.startsWith("/playlist") && url.searchParams.get("list"))
+      await sendId(ctx, url.searchParams.get("list")!, "playlist");
     // See if the url is a video id
     else if (pathname.startsWith("/@")) {
       const channelAlias = pathname.slice(2).split("/")[0].toLowerCase();
       const channelId = await getRssFoundByChannelAlias(channelAlias);
-      if (channelId) return await sendId(ctx, channelId);
+      if (channelId) return await sendId(ctx, channelId, "channel");
 
       try {
         const { data: htmlContent } = await axiod.get<string>(url.href);
@@ -52,7 +55,7 @@ messagesHandler.on("message:text", (ctx) =>
         if (!channelId) return ctx.reply("This channel has no id.");
 
         await db.rssFound.add({ channelId, channelAlias });
-        await sendId(ctx, channelId);
+        await sendId(ctx, channelId, "channel");
       } catch (e) {
         console.error(e);
         await ctx.reply("An error ocurred while processing the video URL.");

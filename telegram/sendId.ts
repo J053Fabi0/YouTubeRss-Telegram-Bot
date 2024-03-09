@@ -6,8 +6,12 @@ import { getFreshRSSAuth } from "../data/controllers/freshRssAuthController.ts";
 
 export const sendIdComposer = new Composer();
 
-export default async function sendId(ctx: Filter<Context, "message:text">, channelId: string) {
-  const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+export default async function sendId(
+  ctx: Filter<Context, "message:text">,
+  id: string,
+  type: "channel" | "playlist"
+) {
+  const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${id}`;
   const freshRssAuth = await getFreshRSSAuth(ctx.from.id.toString());
 
   // if the user is not logged in, just show the feed url
@@ -16,8 +20,10 @@ export default async function sendId(ctx: Filter<Context, "message:text">, chann
   const categories = await getCategories(freshRssAuth.instanceUrl, freshRssAuth.auth);
 
   const keyboard = new InlineKeyboard();
-  if (!categories.find((c) => c === "Uncategorized")) keyboard.text("Uncategorized", `subscribe: ${channelId}`);
-  for (const category of categories) keyboard.row().text(category, `subscribe:${category} ${channelId}`);
+  if (!categories.find((c) => c === "Uncategorized"))
+    keyboard.text("Uncategorized", `subscribe:${type.slice(0, 1)} ${id}`);
+  for (const category of categories)
+    keyboard.row().text(category, `subscribe:${type.slice(0, 1)} ${category} ${id}`);
 
   await ctx.reply(`<code>${feedUrl}</code>\n\nDo you want to subscribe to it? Choose a category.`, {
     parse_mode: "HTML",
@@ -26,21 +32,24 @@ export default async function sendId(ctx: Filter<Context, "message:text">, chann
 }
 
 sendIdComposer.callbackQuery(
-  /^subscribe:(.+)$/,
+  /^subscribe:(p|c)/,
   (ctx) =>
     void (async () => {
       const freshRssAuth = await getFreshRSSAuth(ctx.from.id.toString());
       if (!freshRssAuth)
         return ctx.answerCallbackQuery({ text: "You need to log in to FreshRSS first. Use /freshrss" });
 
-      const data = ctx.callbackQuery.data.slice(10).split(" ");
+      const data = ctx.callbackQuery.data.slice(11).split(" ");
+      const type = ctx.callbackQuery.data[10] as "c" | "p";
       const category = data.slice(0, -1).join(" ") || undefined;
-      const channelId = data[data.length - 1];
+      const id = data[data.length - 1];
 
-      const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+      const feedUrl = new URL("https://www.youtube.com/feeds/videos.xml");
+      if (type === "p") feedUrl.searchParams.set("playlist_id", id);
+      else feedUrl.searchParams.set("channel_id", id);
 
       try {
-        await subscribe(freshRssAuth.instanceUrl, freshRssAuth.auth, feedUrl, category);
+        await subscribe(freshRssAuth.instanceUrl, freshRssAuth.auth, feedUrl.toString(), category);
 
         await ctx.editMessageText(`<code>${feedUrl}</code>\n\nSubscribed!`, { parse_mode: "HTML" });
         await ctx.answerCallbackQuery();
